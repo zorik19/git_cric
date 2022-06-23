@@ -33,7 +33,7 @@ def image_control(request):
     if request.method == "POST":
         services.save_image_form(request)
         if request.POST.get('image_list'):
-            services.run_change_image_in_toi(request=request)
+            services.run_change_image_in_toi(request=request, model=CurrentImageInTOI)
     context = {
         'images': Images.objects.all(),
         'form': services.ImageForm(),
@@ -90,8 +90,8 @@ def ipconfig(request):
             if 'lan' in request.POST.get('exampleRadios'):
                 services.save_new_ip(request=request, models=IpConfigLAN())
                 services.change_wan_and_lan_setting(models=IpConfigLAN, mode='lan')
-
-    return render(request, 'timetable/ipconfig.html', context=services.context_for_network())
+    models = [IpConfig, IpConfigLAN]
+    return render(request, 'timetable/ipconfig.html', context=services.context_for_network(models=models))
 
 
 def table_config(request):

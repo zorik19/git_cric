@@ -2,8 +2,7 @@ from openpyxl import load_workbook
 import time
 from .python_modules import auto_bright, manual_bright, change_image, TOI_test, constant
 from django.contrib import messages
-from .models import ManualBright, AutoBright, Images, CurrentImageInTOI, CabinetCount, \
-    RowColCabinet, IpConfig, ScheduleBright, IpConfigLAN
+from .models import ManualBright, AutoBright, Images, CabinetCount, RowColCabinet, ScheduleBright
 from datetime import datetime
 from django.shortcuts import redirect
 from django.views.generic import View
@@ -53,7 +52,7 @@ def change_mode_brightness(name: str) -> None:
     os.rename(convert_mode, initial_mode)
 
 
-def apply_manual_mode(request):
+def apply_manual_mode(request) -> None:
     manual_db = ManualBright()
     manual_db.manual_count = request.POST.get('manual')
     manual_db.save()
@@ -71,7 +70,7 @@ def get_current_manual_count():
     return field_value
 
 
-def calculate_current_bright_in_auto_mode():
+def calculate_current_bright_in_auto_mode() -> int:
     now = datetime.now().time()
     obj_timetable = AutoBright.objects.all()
     time_list = []
@@ -150,13 +149,13 @@ def delete_image(request, pk):
     return redirect('images')
 
 
-def run_change_image_in_toi(request):
-    CurrentImageInTOI.objects.all().delete()
+def run_change_image_in_toi(request, model) -> None:
+    model.objects.all().delete()
     inp = str(request.POST.get('image_list'))
     list_input_image = []
     for image in inp.split(', '):
         image_now = image.replace(',', '')
-        CurrentImageInTOI.objects.create(name_cur=image_now)
+        model.objects.create(name_cur=image_now)
         list_input_image.append(image_now)
     change_image.main(list_input_image)
 
@@ -333,34 +332,27 @@ def change_wan_and_lan_setting(models, mode: str):
         os.rename(convertible_nmcli, initial_nmcli)
 
 
+def context_for_network(models: list):
+    ip = []
+    mask = []
+    gw = []
+    for model in models:
+        ip_base = model._meta.get_field('ip')
+        ip.append(ip_base.value_from_object(model.objects.last()))
 
+        mask_base = model._meta.get_field('mask')
+        mask.append(mask_base.value_from_object(model.objects.last()))
 
-def context_for_network():
-    ip_base = IpConfig._meta.get_field('ip')
-    ip_value = ip_base.value_from_object(IpConfig.objects.last())
-
-    mask_base = IpConfig._meta.get_field('mask')
-    mask_value = mask_base.value_from_object(IpConfig.objects.last())
-
-    gateway_base = IpConfig._meta.get_field('gateway')
-    gateway_value = gateway_base.value_from_object(IpConfig.objects.last())
-
-    ip_base = IpConfigLAN._meta.get_field('ip')
-    ip_value_lan = ip_base.value_from_object(IpConfigLAN.objects.last())
-
-    mask_base = IpConfigLAN._meta.get_field('mask')
-    mask_value_lan = mask_base.value_from_object(IpConfigLAN.objects.last())
-
-    gateway_base = IpConfigLAN._meta.get_field('gateway')
-    gateway_value_lan = gateway_base.value_from_object(IpConfigLAN.objects.last())
+        gateway_base = model._meta.get_field('gateway')
+        gw.append(gateway_base.value_from_object(model.objects.last()))
 
     context = {
-        'ip': ip_value,
-        'mask': mask_value,
-        'gateway': gateway_value,
-        'ip_lan': ip_value_lan,
-        'mask_lan': mask_value_lan,
-        'gateway_lan': gateway_value_lan,
+        'ip': ip[0],
+        'mask': mask[0],
+        'gateway': gw[0],
+        'ip_lan': ip[1],
+        'mask_lan': mask[1],
+        'gateway_lan': gw[1],
     }
     return context
 
@@ -412,5 +404,4 @@ def apply_schedule_mode():
     x.start()
     change_mode_brightness(name='schedule')
 
-print('gg')
 

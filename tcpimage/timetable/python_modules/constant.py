@@ -25,7 +25,6 @@ cab_11 = '55aa0008fe0001000a0000000000000b00017256'
 cab_12 = '55aa0009fe0001000b0000000000000b00017456'
 list_cabinet_query = [cab_1, cab_2, cab_3, cab_4, cab_5, cab_6, cab_7, cab_8, cab_9, cab_10, cab_11, cab_12]
 
-
 auto_bright_array = [['true', '10 0 0', '96'],
                      ['true', '10 0 0', '96'],
                      ['true', '10 0 0', '96'],
@@ -38,7 +37,6 @@ program_path_ftp = "STOR sdcard/nova/viplex_terminal/program/program_SINAPS-NOUT
 media_path_ftp = "STOR sdcard/nova/viplex_terminal/media/"
 
 tcp_image_path = os.path.abspath(__file__)[:21]
-print(tcp_image_path, 'yy')
 project_path = os.path.join(tcp_image_path, 'timetable/python_modules/source_from_test/')
 timing_xlsx_path = os.path.join(tcp_image_path, 'timetable/python_modules/timing.xlsx')
 path_mode = os.path.join(tcp_image_path, 'timetable/python_modules/')
@@ -50,8 +48,6 @@ list_json = ['planlist.json', 'playlist0.json', 'playSolutionRelation.json', 'sc
              'play_solution.json']
 list_change_json1 = ['planlist1.json', 'planlist2.json', 'planlist3.json']
 list_change_json2 = ['playlist0_1.json', 'playlist0_2.json', 'playlist0_3.json']
-
-colors = ['grey', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white']
 
 hostIP = "192.168.0.100"
 
