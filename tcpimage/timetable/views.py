@@ -85,11 +85,11 @@ def ipconfig(request):
 
             if 'wan' in request.POST.get('exampleRadios'):
                 services.save_new_ip(request=request, models=IpConfig())
-                services.change_setting_file_for_new_ip()
+                services.change_wan_and_lan_setting(models=IpConfig, mode='wan')
 
             if 'lan' in request.POST.get('exampleRadios'):
-
                 services.save_new_ip(request=request, models=IpConfigLAN())
+                services.change_wan_and_lan_setting(models=IpConfigLAN, mode='lan')
 
     return render(request, 'timetable/ipconfig.html', context=services.context_for_network())
 

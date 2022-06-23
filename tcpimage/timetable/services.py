@@ -233,15 +233,15 @@ def save_new_ip(request, models):
     network_param.save()
 
 
-def change_setting_file_for_new_ip():
-    ip_base = IpConfig._meta.get_field('ip')
-    ip_value = ip_base.value_from_object(IpConfig.objects.last())
+def change_wan_and_lan_setting(models, mode: str):
+    ip_base = models._meta.get_field('ip')
+    ip_value = ip_base.value_from_object(models.objects.last())
 
-    mask_base = IpConfig._meta.get_field('mask')
-    mask_value = mask_base.value_from_object(IpConfig.objects.last())
+    mask_base = models._meta.get_field('mask')
+    mask_value = mask_base.value_from_object(models.objects.last())
 
-    gw_base = IpConfig._meta.get_field('gateway')
-    gw_value = gw_base.value_from_object(IpConfig.objects.last())
+    gw_base = models._meta.get_field('gateway')
+    gw_value = gw_base.value_from_object(models.objects.last())
 
     sum_mask = 0
     if mask_value == "255.255.255.255":
@@ -272,51 +272,67 @@ def change_setting_file_for_new_ip():
     initial_nmcli = os.path.join(constant.path_for_ip_change, 'run_main.txt')
     convertible_nmcli = os.path.join(constant.path_for_ip_change, 'run_main2.txt')
 
-    with open(convertible_settings, 'w') as write_settings:
-        with open(initial_settings, 'r') as read:
-            for line in read:
-                if 'ALLOWED_HOST' in line:
-                    print(line)
-                    line = "ALLOWED_HOSTS = ['" + ip_value + "']\r"
-                write_settings.write(line)
+    if 'wan' in mode:
+        with open(convertible_settings, 'w') as write_settings:
+            with open(initial_settings, 'r') as read:
+                for line in read:
+                    if 'ALLOWED_HOST' in line:
+                        print(line)
+                        line = "ALLOWED_HOSTS = ['" + ip_value + "']\r"
+                    write_settings.write(line)
 
-    with open(convertible_gunicorn, 'w') as write_gunicorn:
-        with open(initial_gunicorn, 'r') as read:
-            for line in read:
-                if 'bind' in line:
-                    line = "bind = '" + ip_value + ":8000'\r"
-                write_gunicorn.write(line)
+        with open(convertible_gunicorn, 'w') as write_gunicorn:
+            with open(initial_gunicorn, 'r') as read:
+                for line in read:
+                    if 'bind' in line:
+                        line = "bind = '" + ip_value + ":8000'\r"
+                    write_gunicorn.write(line)
 
-    with open(convertible_tcp, 'w') as write_tcpimage:
-        with open(initial_tcp, 'r') as read:
-            for line in read:
-                if 'server_name' in line:
-                    line = "	server_name " + ip_value + ";\r"
-                if 'proxy_pass' in line:
-                    line = "	proxy_pass http://" + ip_value + ":8000;\r"
-                write_tcpimage.write(line)
+        with open(convertible_tcp, 'w') as write_tcpimage:
+            with open(initial_tcp, 'r') as read:
+                for line in read:
+                    if 'server_name' in line:
+                        line = "	server_name " + ip_value + ";\r"
+                    if 'proxy_pass' in line:
+                        line = "	proxy_pass http://" + ip_value + ":8000;\r"
+                    write_tcpimage.write(line)
 
-    with open(convertible_nmcli, 'w') as write_file:
-        with open(initial_nmcli, 'r') as read:
-            for line in read:
-                if 'delete' in line:
-                    line = "nmcli connection delete 'Wired connection 1'\r"
-                if 'ethernet' in line:
-                    line = "nmcli con add type ethernet con-name 'Wired connection 1' ifname eth1 ip4 " + \
-                           ip_value + "/" + str(sum_mask) + " gw4 " + gw_value + "\r"
-                if 'up' in line:
-                    line = "nmcli connection up 'Wired connection 1'\r"
-                write_file.write(line)
+        with open(convertible_nmcli, 'w') as write_file:
+            with open(initial_nmcli, 'r') as read:
+                for line in read:
+                    if 'delete' in line:
+                        line = "nmcli connection delete 'Wired connection 1'\r"
+                    if 'ethernet' in line:
+                        line = "nmcli con add type ethernet con-name 'Wired connection 1' ifname eth1 ip4 " + \
+                               ip_value + "/" + str(sum_mask) + " gw4 " + gw_value + "\r"
+                    if 'up' in line:
+                        line = "nmcli connection up 'Wired connection 1'\r"
+                    write_file.write(line)
+        os.remove(initial_tcp)
+        os.remove(initial_gunicorn)
+        os.remove(initial_settings)
+        os.remove(initial_nmcli)
 
-    os.remove(initial_tcp)
-    os.remove(initial_gunicorn)
-    os.remove(initial_settings)
-    os.remove(initial_nmcli)
+        os.rename(convertible_tcp, initial_tcp)
+        os.rename(convertible_gunicorn, initial_gunicorn)
+        os.rename(convertible_settings, initial_settings)
+        os.rename(convertible_nmcli, initial_nmcli)
+    if 'lan' in mode:
+        with open(convertible_nmcli, 'w') as write_file:
+            with open(initial_nmcli, 'r') as read:
+                for line in read:
+                    if 'delete' in line:
+                        line = "nmcli connection delete 'Wired connection 2'\r"
+                    if 'ethernet' in line:
+                        line = "nmcli con add type ethernet con-name 'Wired connection 2' ifname eth0 ip4 " + \
+                               ip_value + "/" + str(sum_mask) + " gw4 " + gw_value + "\r"
+                    if 'up' in line:
+                        line = "nmcli connection up 'Wired connection 2'\r"
+                    write_file.write(line)
+        os.remove(initial_nmcli)
+        os.rename(convertible_nmcli, initial_nmcli)
 
-    os.rename(convertible_tcp, initial_tcp)
-    os.rename(convertible_gunicorn, initial_gunicorn)
-    os.rename(convertible_settings, initial_settings)
-    os.rename(convertible_nmcli, initial_nmcli)
+
 
 
 def context_for_network():
