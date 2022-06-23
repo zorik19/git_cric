@@ -400,3 +400,4 @@ def apply_schedule_mode():
 
 print('gg')
 print('services')
+print('edit')
