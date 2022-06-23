@@ -1,0 +1,204 @@
+<!--{% load static %}-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Расчёт пикселей</title>
+  <link  href="/static/timetable/bootstrap-4.5.3-dist/css/bootstrap.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="./style/manage_monitoring.css">
+</head>
+
+<div id="col_position" style="display: none">{{position.col}}</div>
+<div id="row_position" style="display: none">{{position.row}}</div>
+
+<div class="modal-body">
+
+  <div class='progress-wrapper'>
+    <div id='progress-bar' class='progress-bar'  style="background-color: #68a9ef; width: 0%;">&nbsp</div>
+  </div>
+
+  <div id="progress-bar-message" >Ожидание ответа от сервера...</div>
+    <script>
+      function celeryProgressActive(){
+        const progressUrl = "{% url 'celery_progress:task_status' task_id %}";
+        function customResult(resultElement, result) {
+          $( resultElement ).append(
+            $('<p>').text('Sum of all seconds is ' + result)
+          );
+        }
+        CeleryProgressBar.initProgressBar(progressUrl, {
+          onResult: customResult,
+        })
+      }
+      celeryProgressActive()
+    </script>
+
+  <style>
+    table.table1 {
+    width: 100%;
+    height: 100%"
+    }
+    table.table1 tr {
+      /*height: 33%;*/
+      /*text-align: left;*/
+      /*vertical-align: top;*/
+    }
+    table.table1 tr, table.table1 th{
+      /*font-size: x-large;*/
+    }
+    table.table2 {
+      overflow: hidden;
+      display:inline-block;
+    }
+    table.table2 td, table.table2 th {
+      border: 0.5px solid #363636;
+      width: 25px;
+      height: 25px;
+      position: relative;
+      text-align: center;
+      color: #02000c;
+      font-weight: lighter;
+    }
+    table.table2 th {
+      background-color: transparent;
+    }
+    table.table2 td:hover::before {
+      background-color: #f8d704;
+      /*opacity: .9;*/
+      content: '';
+      height: 100%;
+      left: -5000px;
+      position: absolute;
+      top: 0;
+      width: 10000px;
+      z-index: -2 !important;
+      color: white;
+    }
+    table.table2  td:hover::after {
+      background-color: #f8d704;
+      /*opacity: .9;*/
+      content: '';
+      height: 10000px;
+      left: 0;
+      position: absolute;
+      top: -5000px;
+      width: 100%;
+      z-index: -1 !important;
+      color: white;
+    }
+    .cabinetArea {
+      text-align: center;
+      align-items: center;
+      margin: 0 auto;
+      /*width: 900px;*/
+    }
+    .tabs-links li {list-style: none; display: inline-block; border: 1px solid #333; cursor: pointer;
+      text-align: center}
+    .tabs-content {position: relative}
+    .tabs-content li {opacity: 0; position: absolute; transition: all 0.5s ease-in;}
+    .tabs-content li:first-child {opacity: 1;}
+    .modal_window {
+    /*display: none;*/
+      height:100px;
+      width:100px;
+      background: #BBBBBB;
+      text-underline-color: #02000c;
+    }
+    .modal_button {
+      height: 40px;
+      width: 66px;
+      background: #76ce60;
+    }
+  </style>
+
+  <form class="cabinetArea" id="stand_table" action="" style="display: none">
+    {% for x in cab %}
+      <button type="button" class="modal_window" data-toggle="modal" data-target="#mod{{x.name}}"  id="zor_{{x.name}}">
+        <table class="table1">
+          <thead>
+            <tr style="height: 25px; text-align: left; vertical-align: top; font-size: small; color: #0D3349; font-weight: lighter; font-style: italic">
+              <th>{{x.name}}</th>
+            </tr>
+            <tr style="height: 36px; text-align: center; vertical-align: middle;"><th id={{x.name}}></th></tr>
+              <tr style="height: 25px; text-align: right; vertical-align: bottom; font-size: small; color: #0D3349; font-weight: lighter; font-style: italic"><th id="percent_{{x.name}}"></th></tr>
+          </thead>
+        </table>
+      </button>
+
+      <!-- The modal window for each cabinet -->
+<!--      <div class="modal" id="mod{{x.name}}" style="background-color: #1c5e72">-->
+      <div class="modal" id="mod{{x.name}}" style="background-color: #BBBBBB">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+
+            <!-- Modal cabinet header -->
+            <div class="modal-header" style="margin: 0 auto">
+              <h4 class="modal-title" >Кабинет № {{x.name}}</h4>
+            </div>
+
+            <!-- Modal cabinet body -->
+            <div class="row">
+
+              {% for y in pod_cab %}
+              <center>
+                <div class="modal-body">
+                  <div class="col-sm-4">
+                    <div class="card m-2">
+                      <button type="button" class="modal_button" data-toggle="modal"
+                              data-target="#pod_mod_{{y}}_{{x.name}}_" id="pod_{{y}}_{{x.name}}">
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </center>
+
+              <!-- The modal for scoreboard -->
+              <div class="modal" id="pod_mod_{{y}}_{{x.name}}_" style="background-color: #BBBBBB">
+                <div class="modal-dialog modal-lg">
+                  <div class="modal-content">
+
+                  <!-- Modal scoreboard header -->
+                  <div class="modal-header" style="text-align: center">
+                    <h4 class="modal-title" >Модуль № {{y}} | на {{x.name}} кабинете</h4>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                  </div>
+
+                    <!-- Modal scoreboard body -->
+                    <div class="modal-body" id="zor">
+                      <h4 style="text-align: center;">Выберите цвет</h4>
+                        <ul class="tabs-links" id="pod_mod_{{y}}_{{x.name}}_link" style="display: flex; justify-content: center; align-items: center; padding: 0; margin-left: 20px">
+                          <li style="background: red; color: #fdfdfd; width: 100px" id="pod_{{y}}_{{x.name}}_red"></li>
+                          <li style="background: green; color: #ffffff; width: 100px" id="pod_{{y}}_{{x.name}}_green"></li>
+                          <li style="background: blue; color: #ffffff; width: 100px" id="pod_{{y}}_{{x.name}}_blue"></li>
+                        </ul>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+
+            </div>
+
+          <!-- Modal footer -->
+            <center>
+          <div class="modal-footer" style="align-items: center">
+            <button type="button" class="btn btn-danger" data-dismiss="modal" >Закрыть</button>
+          </div>
+              </center>
+
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+  </form>
+</div>
+
+
+<script>
+    var myModalEl = document.getElementById('myModal');
+    var modal = bootstrap.Modal.getInstance(myModalEl);
+    modal.toggle();
+</script>
+
+</html>

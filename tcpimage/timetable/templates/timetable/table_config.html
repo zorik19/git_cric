@@ -1,0 +1,126 @@
+{% extends "timetable/layout/basic.html" %}
+
+{% block title %}Конфигурация{% endblock %}
+
+{% block content %}
+<body class="sinaps">
+  <div class="centered">
+    <h3>Конфигурация ТОИ</h3>
+    <form method="post">
+      {% csrf_token %}
+        <div class="tabs" style="outline: #86cfda 2px;">
+        <label for="column">Столбцов</label>
+        <input id="column" type="number" name="col">
+        <label for="row">Строк</label>
+        <input id="row" type="number" name="row">
+         </div>
+    </form>
+    <br>
+    <div id="target" style="background: #9da5a9; width: 140px; text-align: center; margin: 0 auto; vertical-align: middle; font-size: large">Отобразить</div>
+<form class="listArea" id="rowColTable" action="" method="post">{% csrf_token %}
+
+    <input id="rowInputField" name="rowInputField" style="display: none">
+    <input id="colInputField" name="colInputField" style="display: none">
+
+</form>
+  </div>
+<div class="split left">
+
+</div>
+
+</body>
+<style>
+    .centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+    .tabs {
+      z-index: 200000;
+      margin-left: auto;
+      margin-right: auto;
+      /*align-items: center;*/
+      text-align: center;
+    }
+
+    .tabs>input {
+      width: 50px;
+      height: 50px;
+      display: inline-block;
+      text-align: center;
+      /*margin: 20px;*/
+    }
+</style>
+<script>
+  $("#row").keyup(function (){
+      row = $(this).val()
+  })
+  $("#column").keyup(function (){
+      column = $(this).val()
+  })
+
+  $("#target").click(function() {
+      cabinet = row * column
+      // console.log(row*column, 'sum')
+      drawSquare()
+      // delete row
+      // delete column
+  })
+
+  let areaList = document.querySelector("#listArea")
+  function drawSquare() {
+       for(let a = 0; a < cabinet; a ++) {
+           appendSquare(a)
+       }
+       let rowInputField = document.getElementById("rowInputField")
+       rowInputField.value = row
+       let colInputField = document.getElementById("colInputField")
+       colInputField.value = column
+       $('.listArea').append(
+          $('<button/>', {
+                'type': 'submit',
+                'text': 'Применить',
+                'id': 'zor',
+                'class': 'btn btn-primary form-control',
+          }
+      )
+      )
+  }
+
+  function appendSquare(a) {
+      let columnWidth = column * 100 + column * 10
+      let k = columnWidth.toString() + 'px'
+      let cabinet_id = (a + 1)
+      let cabinet_id_text = cabinet_id.toString()
+      $('.listArea').css("width", k)
+      $('.listArea').append(
+        $('<div/>', {'id': cabinet_id_text,
+                     'name': 'cab_name',
+                     'class': 'className',
+                     'style':'width: 100px; height: 100px; background: transparent; margin: 5px; display: inline-block; text-align: center; vertical-align: middle'
+                    }
+        )
+      );
+      let cab = document.getElementById(cabinet_id_text)
+      // let zor =  document.createTextNode(cabinet_id_text)
+      // cab.appendChild(zor);
+      let input_id = document.createElement("input")
+      input_id.type = 'hidden'
+      input_id.name = 'input_id'
+
+      let input = document.createElement("input");
+      input.type = 'number'
+      input.name = 'change_scheme'
+      input.className = 'inp'
+      input.style.width = '90px'
+      input.style.height = '90px'
+      input.style.fontSize = 'xx-large'
+      input.style.textAlign = 'center'
+
+      cab.appendChild(input)
+      cab.appendChild(input_id)
+ }
+</script>
+{% endblock %}

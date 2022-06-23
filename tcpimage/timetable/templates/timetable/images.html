@@ -1,0 +1,121 @@
+{% extends "timetable/layout/basic.html" %}
+{% block title %}Катринки{% endblock %}
+
+{% block content %}
+
+<body class="sinaps">
+  <div class="container" >
+    <div style="padding-top: 1%">
+    <div class="row" >
+      {% for x in images %}
+        <div class="col-sm-4" >
+          <div class="card m-2" style="background: #BBBBBB">
+            <img src="{{ x.photo.url }}" alt="" class="card-img-top" height="200px">
+              {% for cur in current %}
+                {% if x.photo == cur.name_cur %}
+                  <h6 style="color: #862852; text-align: center; font-weight: bold " >- загружен на ТОИ</h6>
+                {% endif%}
+              {% endfor%}
+            <div class="card-footer" style="align-items: center; text-align: center;">
+              <small class="text-muted">{{ x.date }}</small><br>
+                <p class="line-limit-length">
+                  <label for="chek" >Выбрать</label>
+                  <label>
+                    <input type="checkbox" value="{{ x.photo }}" class="chkcvalues" style="display: inline-block; z-index: 10;">
+                  </label>
+                  {{ x.photo }}
+                </p>
+              <form method="post" action="{% url 'delete_image' x.pk %}">
+                {% csrf_token %}
+                <button type="submit"  style="color: #ce6884; border: 0; background: transparent">Удалить</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+      <div class="col-sm-4">
+        <div class="card m-2" style="background: #eec6d0">
+          <h4 style="text-align: center; padding-top: 10%;  padding-bottom: 10%; vertical-align: center">
+            <div class="card-footer" style="align-items: center; text-align: center">Добавить картинку</div>
+          </h4>
+          <form action="" method="post" enctype="multipart/form-data" style="text-align: center">
+            {% csrf_token %}
+            {{ form }} <br><br>
+            <input type="submit" style="background: #e1819e " value="Загрузить"><br><br>
+          </form>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+  <br>
+  <div class="content_box">
+    <form method="post">
+      {% csrf_token %}
+      <h4 style="text-align: center">Загрузить выбранные фото на ТОИ</h4>
+      <div class="input-group mb-3" style="width: 800px">
+        <input type="text" class="form-control" placeholder="выбранные фото.." aria-label="Recipient's username"
+             aria-describedby="basic-addon2" name="image_list" id="txt_values">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="submit" id="but2"
+                  onclick="return alert('Выполнить загрузку фото?')">Загрузить на плату</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+
+</body>
+<style>
+  .content_box {
+    padding-top: 3%;
+    padding-bottom: 3%;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    /*align-content: center;*/
+    justify-content: center;
+    overflow: auto;
+  }
+</style>
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+  $(document).ready(function () {
+  $('.chkcvalues').click(function () {
+  var txt = "";
+  $('.chkcvalues:checked').each(function () {
+    txt += $(this).val() + ", "
+    });
+    txt = txt.substring(0, txt.length - 1);
+    $('#txt_values').val(txt);
+      });
+    });
+</script>
+
+
+<style>
+  .line-limit-length {
+    border: 0;
+    width: 80%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; // Текст не переносится, поэтому часть, которая превышает одну строку, перехватывается и отображается ...
+}
+  p {
+  display: inline-block;
+  width: 100px;
+  border: 1px solid;
+  /*padding: 2px 5px;*/
+
+  /* Both of the following are required for text-overflow */
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+
+</style>
+{% endblock javascript %}

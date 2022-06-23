@@ -1,0 +1,64 @@
+{% extends "timetable/layout/basic.html" %}
+{% block title %}Статистика{% endblock %}
+
+{% block content %}
+
+<body class="sinaps">
+
+<h1 style="text-align: center">Статистика платы</h1>
+
+<div class="container" style="text-align: center; margin-top: 60px">
+      <div class="block">
+      <h3>Загруженность процессора:</h3>
+      <div class="chart_statistic x-60" id="proc">
+        <p id="val_proc">{{proc}}%</p>
+      </div>
+      </div>
+<div class="block">
+
+      <h3>Заполнено памяти:</h3>
+      <div class="chart_statistic x-20" id="memory">
+        <p id="val_memory">{{memory}}%</p>
+      </div>
+    </div>
+</div>
+<form method="post" style="text-align: center; margin-top: 60px">
+    {% csrf_token %}
+  <button class="color_button_timetable" id="run1" >Обновить</button>
+  </form>
+
+<style>
+  .block {
+  height: auto;
+  width: 400px;
+  display: inline-block;
+  }
+  :root {
+        --size: 250px;
+        --bord: 30px;
+  }
+  .x-60 {
+     --value: 9%;
+  }
+  .x-20 {
+        --value: 37%;
+    }
+    * {
+        box-sizing:border-box;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        // let x_60_id = document.getElementById('val_proc')
+        // let x_60 = x_60_id.textContent
+        // console.log(x_60)
+        let z = document.getElementById("proc")
+        console.log(z)
+
+        z['.x-20'] = 65
+    });
+
+
+</script>
+</body>
+{% endblock %}

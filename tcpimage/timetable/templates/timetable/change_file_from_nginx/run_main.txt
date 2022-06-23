@@ -1,0 +1,4 @@
+#!/bin/bash
+nmcli connection delete 'Wired connection 2'
+nmcli con add type ethernet con-name 'Wired connection 2' ifname eth0 ip4 111.111.111.111/32 gw4 222.222.222.222nmcli connection up 'Wired connection 2'
+nmcli connection show

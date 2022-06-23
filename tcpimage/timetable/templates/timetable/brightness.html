@@ -1,0 +1,456 @@
+{% extends "timetable/layout/basic.html" %}
+
+{% block title %}Яркость{% endblock %}
+
+{% block content %}
+<body class="sinaps">
+
+ <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #212529;
+      text-align: center;
+      background-color: #fff;
+    }
+
+    .tabs {
+      z-index: 200;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .tabs>input[type="radio"] {
+      display: none;
+    }
+
+    .tabs>input[type="radio"]:checked+label {
+      background-color: #ad4c69;
+      color: #ffffff;
+    }
+
+    .tabs>div {
+      /* скрыть контент по умолчанию */
+      display: none;
+      /*border: 1px solid #eee;*/
+      /*padding: 10px 15px;*/
+      /*border-radius: 4px;*/
+    }
+
+    /* отобразить контент, связанный с вабранной радиокнопкой (input type="radio") */
+    #tab-btn-1:checked~#content-1,
+    #tab-btn-2:checked~#content-2,
+    #tab-btn-3:checked~#content-3,
+    #tab-btn-4:checked~#content-4 {
+      display: block;
+    }
+
+    .tabs>label {
+      color: #ffffff;
+      display: inline-block;
+      text-align: center;
+      vertical-align: middle;
+      user-select: none;
+      background-color: #949494;
+      border: 1px solid transparent;
+      padding: 12px 18px;
+      margin: 10px;
+      font-size: 16px;
+      line-height: 1.5;
+      /*border-radius: 4px;*/
+      transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+      cursor: pointer;
+      /*margin-bottom: 10px;*/
+    }
+    .tabs>label:first-of-type {
+      margin-left: 0;
+    }
+
+    .split {
+  height: 80%;
+  /*width: 50%;*/
+  position: fixed;
+  z-index: 1;
+  /*top: 60px;*/
+  overflow-x: hidden;
+  padding-top: 1%;
+}
+/* Control the left side */
+.left {
+  /*left: 0;*/
+   width: 30%;
+  left: 0;
+  padding-top: 40px;
+  /*background-color: #fdfcfc;*/
+}
+/* Control the right side */
+.right {
+    width: 70%;
+  /*right: 0;*/
+    right: 0;
+  /*background-color: #fdfcfc;*/
+}
+/* If you want the content centered horizontally and vertically */
+.centered {
+  /*position: absolute;*/
+  margin: auto;
+  text-align: center;
+}
+</style>
+
+
+<body>
+  <br>
+  <br>
+
+  <div>
+    <h4>Последний выставленный режим яркости: {{mode}}</h4>
+    <br>
+  </div>
+  <div class="tabs">
+
+    <input type="radio" name="tab-btn" id="tab-btn-1" value="" class="checked">
+    <label for="tab-btn-1" style="font-size: large">Авто-режим</label>
+    <input type="radio" name="tab-btn" id="tab-btn-2" value="">
+    <label for="tab-btn-2" style="font-size: large">Ручной режим</label>
+    <input type="radio" name="tab-btn" id="tab-btn-3" value="">
+    <label for="tab-btn-3" style="font-size: large">Режим расписания</label>
+
+
+    <div id="content-3">
+      <center>
+        <h4>Данный режим автоматически выставит параметры <b>времени</b> и <b>яркости</b>
+          <br> в зависимости от: <br><span style="color: #733347">-таблицы рассветов и закатов <br>-датчика яркости у ТОИ</span> </h4>
+        <br><br><br>
+        <h4>Расписание на сегодня</h4>
+          <table id="stand_table1" class="table table-bordered" style="text-align: center; width: 40vw">
+            <tr>
+              <th style="width: 10vw">Начало<br>рассвета</th>
+              <th style="width: 10vw">Восход</th>
+              <th style="width: 10vw">Заход</th>
+              <th style="width: 10vw">Наступление<br>темноты</th>
+            </tr>
+            <tr>
+              {% for item in shc_mode %}
+                <td>{{item.time_bright}}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              {% for item in shc_mode %}
+                <td>Яркость {{item.bright_count}}%</td>
+              {% endfor %}
+            </tr>
+          </table>
+
+
+        <form method="post" >
+        {% csrf_token %}
+        <button type="submit" class="color_button_timetable" name="schedule_mode">Применить</button>
+          <h1 id="app">{{text}}</h1>
+
+      </form>
+      </center>
+    </div>
+
+    <div id="content-1">
+      <div class="split right">
+        <div class="centered">
+<!--      <div class="container">-->
+
+            <table id="stand_table" class="table table-bordered" style="width: 40vw; margin-left: 15vw" >
+<!--              <h3 style="color: #862852">Текущая яркость в авто-режиме: {{auto_current}}</h3>-->
+              <caption style="color: #0f0f0f; font-size: large">Текущая яркость в авто-режиме: {{auto_current}} %</caption>
+              <tr >
+                <th >Время<br>начала</th>
+                <th >Яркость<br>%</th>
+                <th >Управление</th>
+              </tr>
+
+              {% for position in schedule %}
+              <div id="auto" style="vertical-align: middle">
+                <tr id="position-{{position.id}}">
+                  <td class="stand_name stand_data" name="time_bright" id="zor">{{position.time_bright}}</td>
+                  <td class="stand_bright_count stand_data" name="bright_count">{{position.bright_count}}</td>
+                  <td align="center">
+                    <button class="btn btn-success form-control" onClick="edit_stand({{position.id}})" data-toggle="modal" data-target="#myModal"
+                    style="width: 100px">Изменить</button>
+                    <button class="btn btn-danger form-control" onClick="delete_stand({{position.id}})" style="width: 100px">Удалить</button>
+                  </td>
+                </tr>
+                </div>
+              {% endfor %}
+            </table>
+
+          <form method="post" >
+            {% csrf_token %}
+<!--            <input name="auto_mode" value="">-->
+            <button type="submit" class="color_button_timetable" name="auto_mode" >Применить</button>
+          </form>
+        </div>
+      {% if messages %}
+        {% for message in messages %}
+          <div style="width: 400px">
+          <div class="alert alert-secondary alert-dismissible fade show" role="alert">
+            <strong>{{message}}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          </div>
+        {% endfor %}
+    {% endif %}
+      </div>
+
+
+      <div class="split left">
+
+        <h4>Добавить значение:</h4>
+        <form id="add_stand" action="" >
+          <br>
+          <div class="form-group">
+            <label>
+              <input class="datetime" type="time" name="time_bright" style="width: 100px" placeholder="Time">
+            </label>
+          </div>
+          <div class="form-group">
+            <label>
+              <input class="form-control" type="number" style="width: 100px" name="bright_count" placeholder="Яркость">
+            </label>
+          </div>
+          <button class="btn btn-danger form-control" style="width: 100px" type="submit">Добавить</button>
+          <br><br>
+        </form>
+      </div>
+    </div>
+
+   <!-- Modal for edit -->
+      <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title" id="myModalLabel">Редактирование значения</h4>
+            </div>
+
+            <form id="update_stand" action="">
+              <div class="modal-body">
+                <input class="form-control" id="form-id" type="hidden" name="form_id"/>
+                  <label for="time_bright">Время начала</label>
+                <input class="form-control" id="form-name" type="text" name="form_time_bright" style="text-align: center"/>
+                  <label for="bright_count">Яркость %</label>
+                <input class="form-control" id="form-bright_count" type="text" name="form_bright_count" style="text-align: center"/>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" >Сохранить</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+
+    <div id="content-2">
+      <center>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <br>
+        <h3>0-100%</h3>
+
+      <form method="post">
+          {% csrf_token %}
+          <div class="slide_container_timetable">
+            <input type="range" min="0" max="100" value={{current_manual_count}} class="slider_timetable" id="myRange" name="manual">
+            <br><br>
+            <p>Значение яркости: <span id="demo"></span>%</p>
+          </div>
+        <button class="color_button_timetable" type="submit" id="but2">Применить</button>
+      </form>
+      <br>
+      {% if messages %}
+        {% for message in messages %}
+          <div style="width: 400px">
+          <div class="alert alert-secondary alert-dismissible fade show" role="alert">
+            <strong>{{message}}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          </div>
+        {% endfor %}
+    {% endif %}
+
+      </center>
+    </div>
+  </div>
+<div id="mode" style="font-size: 0">
+  {{mode}}
+</div>
+</body>
+
+
+    <script>
+        let slider = document.getElementById("myRange");
+        let output = document.getElementById("demo");
+        output.innerHTML = slider.value;
+
+        slider.oninput = function() {
+          output.innerHTML = this.value;
+        }
+    </script>
+
+</ul>
+</body>
+<script>
+      let radios = document.getElementsByName('tab-btn');
+      let auto = document.getElementById('tab-btn-1');
+      let idMode = document.getElementById('mode')
+      let modeText = idMode.textContent
+      console.log(modeText, 'modeText')
+      function check() {
+         if (modeText.indexOf('auto') !== -1) {
+           console.log('in auto')
+            document.getElementById("tab-btn-1").checked = true;
+         }
+         else if (modeText.indexOf('manual') !== -1) {
+           console.log('in manual')
+            document.getElementById("tab-btn-2").checked = true;
+         }
+         else if (modeText.indexOf('schedule') !== -1) {
+           console.log('in schedule')
+            document.getElementById("tab-btn-3").checked = true;
+         }
+      }
+      check()
+      console.log(radios, 'radios')
+    </script>
+
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+
+// Create Django Ajax Call
+$("form#add_stand").submit(function() {
+    var timeBrightInput = $('input[name="time_bright"]').val().trim();
+    var brightCountInput = $('input[name="bright_count"]').val().trim();
+    if (timeBrightInput && brightCountInput) {
+        // Create Ajax Call. Where call for update information on site
+        $.ajax({
+            url: '{% url "crud_ajax_create" %}',
+            data: {
+                'time_bright': timeBrightInput,
+                'bright_count': brightCountInput,
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.stand) {
+                  appendStand(data.stand);
+                }
+            }
+        });
+
+    } else {
+        alert("All fields must have a valid value.");
+    }
+    $('form#add_stand').trigger("reset");
+    return false;
+});
+
+
+// Delete Django Ajax Call
+function delete_stand(id) {
+  var action = confirm("Удалить яркость?");
+  if (action != false) {
+    $.ajax({
+        url: '{% url "crud_ajax_delete" %}',
+        data: {
+            'id': id,
+        },
+        dataType: 'json',
+        success: function (data) {
+            if (data.deleted) {
+              $("#stand_table #position-" + id).remove();
+            }
+        }
+    });
+  }
+}
+// Update Django Ajax Call
+function edit_stand(id) {
+  if (id) {
+    tr_id = "#position-" + id;
+    time_bright = $(tr_id).find(".stand_name").text();
+    bright_count = $(tr_id).find(".stand_bright_count").text();
+    $('#form-id').val(id);
+    $('#form-name').val(time_bright);
+    $('#form-bright_count').val(bright_count);
+  }
+}
+
+// Create Django Ajax Call
+$("form#update_stand").submit(function() {
+    var idInput = $('input[name="form_id"]').val().trim();
+    var timeBrightInput = $('input[name="form_time_bright"]').val().trim();
+    var brightCountInput = $('input[name="form_bright_count"]').val().trim();
+    if (timeBrightInput && brightCountInput) {
+        // Create Ajax Call
+        $.ajax({
+            url: '{% url "crud_ajax_update" %}',
+            data: {
+                'id': idInput,
+                'time_bright': timeBrightInput,
+                'bright_count': brightCountInput,
+            },
+            dataType: 'json',
+            success: function (data) {
+              if (data.stand) {
+                  updateStandTable(data.stand);
+                }
+            }
+        });
+
+    } else {
+        alert("All fields must have a valid value.");
+    }
+    $('form#update_stand').trigger("reset");
+    $('#myModal').modal('hide');
+    return false;
+});
+// При добавлении нового значения
+function appendStand(stand) {
+  $("#stand_table > tbody:last-child").append(`
+        <tr id="position-${stand.id}">
+            <td class="stand_name" name="time_bright">${stand.time_bright}</td>
+            '<td class="stand_bright_count" name="bright_count">${stand.bright_count}</td>
+            '
+
+        </tr>
+    `);
+}
+
+
+function updateStandTable(stand){
+    $("#stand_table #position-" + stand.id).children(".stand_data").each(function() {
+      console.log('ssssss')
+        var attr = $(this).attr("time_bright");
+        if (attr == "time_bright") {
+          $(this).text(stand.time_bright);
+        } else if (attr == "bright_count") {
+          $(this).text(stand.bright_count);
+        }
+      });
+}
+</script>
+
+
+
+{% endblock javascript %}

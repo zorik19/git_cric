@@ -1,0 +1,109 @@
+.tabs-links li {list-style: none; display: inline-block; padding: 5px 10px; border: 1px solid #333; cursor: pointer;
+    text-align: center}
+  .tabs-content {position: relative}
+  .tabs-content li {opacity: 0; position: absolute; transition: all 0.5s ease-in;}
+  .tabs-content li:first-child {opacity: 1;}
+  .modal_window {
+      height:100px;
+      width:100px;
+      background: #838383;
+      text-underline-color: #2aabd2;
+  }
+  .modal_button {
+      height: 40px;
+      width: 66px;
+      background: #76ce60;
+  }
+
+
+  .container_33 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    vertical-align: middle;
+  }
+  .container_33 div {
+    width: 100%;
+    /*padding: 5px;*/
+  }
+  .container_33 button {
+    margin: auto;
+  }
+  .container_33 h4 {
+    margin: auto;
+  }
+  table {
+    overflow: hidden;
+    display:inline-block;
+  }
+  td, th {
+    border: 0.5px solid #363636;
+    width: 25px;
+    height: 25px;
+    position: relative;
+    text-align: center;
+    color: #bcc5d0;
+    font-weight: lighter;
+  }
+  th {
+    background-color: transparent;
+    /*border: 0;    */
+  /*background-color:#fff;*/
+  }
+  td:hover::before {
+    background-color: #f8d704;
+    /*opacity: .9;*/
+    content: '';
+    height: 100%;
+    left: -5000px;
+    position: absolute;
+    top: 0;
+    width: 10000px;
+    z-index: -2 !important;
+    color: white;
+  }
+
+
+  td:hover::after {
+    background-color: #f8d704;
+    /*opacity: .9;*/
+    content: '';
+    height: 10000px;
+    left: 0;
+    position: absolute;
+    top: -5000px;
+    width: 100%;
+    z-index: -1 !important;
+    color: white;
+  }
+  .yearTable td{
+    /*border:1px solid #CCCCCC;*/
+    width:45px;
+    height:45px;
+    text-align:center;
+    vertical-align:middle;
+    font-style: italic;
+
+  }
+
+  .daySubscript {
+    /*width: 150px;*/
+    position: absolute;
+    top: 0;
+    /*right: -8px;*/
+    left: 5px;
+    font-style: italic;
+    font-size: small;
+    color: #09248c;
+    text-align: left;
+
+  }
+  .percent_broken_pixel {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-weight: bold;
+    font-size: small;
+    color: #02000c;
+    text-align: right;
+  }

@@ -1,0 +1,65 @@
+{% extends "timetable/layout/basic.html" %}
+
+{% block title %}Тестирование{% endblock %}
+
+{% block content %}
+<body class="sinaps">
+  <br>
+  <form method="post" style="text-align: center; ">
+    {% csrf_token %}
+      <button type="submit" class="color_button_timetable" name="on_display">Включить</button>
+      <button type="submit" class="color_button_timetable" name="off_display">Выключить</button>
+      <br><br>
+      <div class="container">
+        <div class="block">
+          <h4>Вывести цвета на экран:</h4>
+            <button type="submit" class="color_button_timetable" name="white">Белый</button><br>
+            <button type="submit" class="color_button_timetable" name="red">Красный</button><br>
+            <button type="submit" class="color_button_timetable" name="blue">Синий</button><br>
+            <button type="submit" class="color_button_timetable" name="green">Зеленый</button><br>
+            <button type="submit" class="color_button_timetable" name="gray">Серый</button>
+        </div>
+        <div class="block">
+          <h4>Линии на экране:</h4>
+            <button type="submit" class="color_button_timetable" name="vertical">Верт-ые</button><br>
+            <button type="submit" class="color_button_timetable" name="horizon">Гориз-ые</button><br>
+            <button type="submit" class="color_button_timetable" name="oblique">Косые</button><br>
+            <button type="submit" class="color_button_timetable" name="mix">Смешанный</button><br>
+            <button style="visibility: hidden"></button>
+        </div>
+      </div>
+      <br>
+      <button type="submit" class="color_button_timetable" name="initial" style="width: 400px!important;">
+        Завершить тестирование
+      </button>
+      <center>
+        {% if messages %}
+          {% for message in messages %}
+            <div style="width: 400px; text-align: center">
+              <div class="alert alert-secondary alert-dismissible fade show" role="alert" style="text-align: center">
+                <strong>{{message}}</strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </center>
+  </form>
+
+<style>
+  .block {
+  height: auto;
+  width: 400px;
+  display: inline-block;
+  }
+  .color_button_timetable {
+    margin: 10px;
+    width: 160px!important;
+  }
+</style>
+</body>
+
+{% endblock %}
+

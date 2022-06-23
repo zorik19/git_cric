@@ -1,0 +1,48 @@
+{% extends "timetable/layout/basic.html" %}
+
+{% block title %}Тестирование{% endblock %}
+
+{% block content %}
+
+    <section class="button">
+        <div class="button__title">jQueryUI modal</div>
+        <div class="button__area">
+            <button id="button__click" class="button__click">start!</button>
+        </div>
+
+        <div id="click__modal" style="display:none;">
+        </div>
+
+    </section>
+
+<script>
+$(document).ready(function () {
+    console.log('rrrr')
+$('#button__click').click(function () {
+    console.log('in')
+        // Create Ajax Call
+        $.ajax({
+            url: '{% url "start_celery" %}',
+            success: function (data) {
+                console.log('eeep')
+              // function monitor() {
+              //   var progressUrl = "{% url 'celery_progress:task_status' task_id %}";
+              //   function customResult(resultElement, result) {
+              //     $(resultElement).append(
+              //             $('<p>').text('Sum of all seconds is ' + result)
+              //     );
+              //   }
+              //   CeleryProgressBar.initProgressBar(progressUrl, {
+              //     onResult: customResult,
+              //   })
+              // }
+              // monitor()
+}})
+})
+})
+</script>
+
+{% endblock %}
+{% block javascript %}
+
+{% endblock javascript %}
