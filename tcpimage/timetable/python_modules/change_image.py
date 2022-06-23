@@ -8,9 +8,9 @@ import logging
 class UpdateImage:
 
     def __init__(self, image_list):
-        self.source_path = os.path.join(constant.path_for_image, 'timetable/python_modules/source/')
-        self.media_path = os.path.join(constant.path_for_image, 'media')
-        self.out_path = os.path.join(constant.path_for_image, 'timetable/python_modules/source/output/')
+        self.source_path = os.path.join(constant.tcp_image_path, 'timetable/python_modules/source/')
+        self.media_path = os.path.join(constant.tcp_image_path, 'media')
+        self.out_path = os.path.join(constant.tcp_image_path, 'timetable/python_modules/source/output/')
         self.input_image_list = image_list
 
     def run(self):

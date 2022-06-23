@@ -15,7 +15,7 @@ import threading
 
 
 def current_mode():
-    with open('C://TOI_prod_CELERY/tcpimage/timetable/python_modules/mode_bright.txt', 'r') as mode:
+    with open(os.path.join(constant.path_mode, 'mode_bright.txt'), 'r') as mode:
         for line in mode:
             return line
 
@@ -264,6 +264,9 @@ def change_setting_file_for_new_ip():
         sum_mask = 24
 
     print('sum_mask ', sum_mask)
+    dir_ = os.path.abspath(os.curdir)
+    print(dir_)
+    print(constant.capa, 'hh')
 
     initial_settings = os.path.join(constant.path_for_ip_change, 'settings.py')
     convertible_settings = os.path.join(constant.path_for_ip_change, 'settings2.py')
@@ -302,8 +305,12 @@ def change_setting_file_for_new_ip():
         with open(initial_nmcli, 'r') as read:
             for line in read:
                 if 'ethernet' in line:
-                    line = "nmcli con add type ethernet con-name 'Wired connection 2' ifname eth0 ip4 " + \
+                    line = "nmcli con add type ethernet con-name 'Wired connection 1' ifname eth1 ip4 " + \
                            ip_value + "/" + str(sum_mask) + " gw4 " + gw_value + "\r"
+                if 'delete' in line:
+                    line = "nmcli connection delete 'Wired connection 1'"
+                if 'up' in line:
+                    line = "nmcli connection up 'Wired connection 1'"
                 write_file.write(line)
 
     os.remove(initial_tcp)
@@ -365,7 +372,7 @@ def create_auto_bright_array():
         for line in count:
             list_bright_schedule.append(int(line))
 
-    wb = load_workbook(constant.path_to_table_bright_xlsx)
+    wb = load_workbook(constant.timing_xlsx_path)
     sheet = wb.get_sheet_by_name('Лист1')
     list_result = []
 

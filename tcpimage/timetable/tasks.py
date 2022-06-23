@@ -152,7 +152,7 @@ class CabinetMonitor:
                 percent_broken_pixel = round(percent_broken_pixel, 3)
                 self.dict_cabinets[cabinet]['col'] = cabinet_count
                 self.dict_cabinets[cabinet]['percent'] = percent_broken_pixel
-        with open("C:/TOI_prod_CELERY/tcpimage//timetable/static/timetable/monitor2.json", "w") as write_file:
+        with open(constant.path_monitor_json, "w") as write_file:
             json.dump(self.dict_cabinets, write_file, indent=4)
 
     def run(self) -> None:

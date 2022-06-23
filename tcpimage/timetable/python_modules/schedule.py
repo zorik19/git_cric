@@ -22,7 +22,7 @@ def amount_of_brightness() -> int:
 
 
 def create_schedule_from_xlsx(list_bright_const: list) -> tuple:
-    wb = load_workbook(constant.path_to_table_bright_xlsx)
+    wb = load_workbook(constant.timing_xlsx_path)
     sheet = wb.get_sheet_by_name('Лист1')
     list_result = []
     now_time = datetime.now().time()
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     a, b = create_schedule_from_xlsx(calculate_bright_list(delta=0, num_str=0))
     result_list = a
 
-    with open('C://TOI_prod_CELERY/tcpimage/timetable/python_modules/mode_bright.txt', 'r') as mode:
+    with open(os.path.join(constant.path_mode, 'mode_bright.txt'), 'r') as mode:
         for line in mode:
             if line == 'schedule':
                 try:
