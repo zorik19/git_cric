@@ -357,7 +357,10 @@ def change_cabinet_scheme(request):
         col=request.POST.get('colInputField')
     )
 
+
 print('opp')
+
+
 def create_auto_bright_array():
     list_bright_schedule = []
     bright_count = os.path.join(constant.path_mode, 'bright_count.txt')
@@ -393,6 +396,7 @@ def apply_schedule_mode():
     x = threading.Thread(target=auto_bright.main, args=(list1,))
     x.start()
     change_mode_brightness(name='schedule')
+
 
 print('gg')
 print('services')
