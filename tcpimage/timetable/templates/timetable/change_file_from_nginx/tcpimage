@@ -1,8 +1,8 @@
 server {
 	listen 80;
-	server_name 111.111.111.111;location ^~ /static {
+	server_name 222.222.222.222;location ^~ /static {
 	alias /var/www/static/;
 }
 location / {
-	proxy_pass http://111.111.111.111:8000;	}
+	proxy_pass http://222.222.222.222:8000;	}
 }

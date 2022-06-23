@@ -263,11 +263,6 @@ def change_setting_file_for_new_ip():
     if mask_value == "255.255.255.0":
         sum_mask = 24
 
-    print('sum_mask ', sum_mask)
-    dir_ = os.path.abspath(os.curdir)
-    print(dir_)
-    print(constant.capa, 'hh')
-
     initial_settings = os.path.join(constant.path_for_ip_change, 'settings.py')
     convertible_settings = os.path.join(constant.path_for_ip_change, 'settings2.py')
     initial_gunicorn = os.path.join(constant.path_for_ip_change, 'gunicorn_config.py')
@@ -304,13 +299,13 @@ def change_setting_file_for_new_ip():
     with open(convertible_nmcli, 'w') as write_file:
         with open(initial_nmcli, 'r') as read:
             for line in read:
+                if 'delete' in line:
+                    line = "nmcli connection delete 'Wired connection 1'\r"
                 if 'ethernet' in line:
                     line = "nmcli con add type ethernet con-name 'Wired connection 1' ifname eth1 ip4 " + \
                            ip_value + "/" + str(sum_mask) + " gw4 " + gw_value + "\r"
-                if 'delete' in line:
-                    line = "nmcli connection delete 'Wired connection 1'"
                 if 'up' in line:
-                    line = "nmcli connection up 'Wired connection 1'"
+                    line = "nmcli connection up 'Wired connection 1'\r"
                 write_file.write(line)
 
     os.remove(initial_tcp)
