@@ -403,5 +403,6 @@ def apply_schedule_mode():
     x = threading.Thread(target=auto_bright.main, args=(list1,))
     x.start()
     change_mode_brightness(name='schedule')
+    # hh
 
 
