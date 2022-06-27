@@ -48,3 +48,17 @@ if not_null_variable == None:
     print('not_null_variable is None')
 else:
     print('not_null_variable is not None')
+
+
+
+# lambda
+some_list = [1, 2, '3']
+print(list(filter(lambda x: isinstance(x, int), some_list)))
+
+
+
+
+
+
+
+
