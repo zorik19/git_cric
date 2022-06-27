@@ -14,12 +14,6 @@ import os
 import threading
 
 
-def current_mode():
-    with open('C://TOI_prod_CELERY/tcpimage/timetable/python_modules/mode_bright.txt', 'r') as mode:
-        for line in mode:
-            return line
-
-
 def apply_auto_mode(request) -> None:
     time_field_name = 'time_bright'
     bright_field_name = 'bright_count'
