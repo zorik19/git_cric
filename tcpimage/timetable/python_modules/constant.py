@@ -35,8 +35,10 @@ list_plat = ["user admin\n", "pass 10015504@novaStar\n", "OPTS utf8 on\n", "PWD\
 
 program_path_ftp = "STOR sdcard/nova/viplex_terminal/program/program_SINAPS-NOUT-24/1/"
 media_path_ftp = "STOR sdcard/nova/viplex_terminal/media/"
+# tdd
+split_path = os.path.abspath(__file__).split('timetable')
 
-tcp_image_path = os.path.abspath(__file__)[:21]
+tcp_image_path = split_path[0]
 project_path = os.path.join(tcp_image_path, 'timetable/python_modules/source_from_test/')
 timing_xlsx_path = os.path.join(tcp_image_path, 'timetable/python_modules/timing.xlsx')
 path_mode = os.path.join(tcp_image_path, 'timetable/python_modules/')

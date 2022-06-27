@@ -46,8 +46,8 @@ out/
 atlassian-ide-plugin.xml
 
 # Python #
-#*.py[cod]
-#*$py.class
+*.py[cod]
+*$py.class
 
 # Distribution / packaging
 .Python build/
