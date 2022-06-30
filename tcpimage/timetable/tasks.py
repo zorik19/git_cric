@@ -59,44 +59,45 @@ class CabinetMonitor:
             n += 1
         return list_pair
 
+    def create_binary(self, list_hex: list, position: str) -> list:
+        list_binary = []
+        list_done = []
+        num = 0
+        for pix in list_hex:
+            bin_pix = self.binary_conversion(pix)
+            if position == 'up':
+                list_binary.append(bin_pix)
+            if position == 'down':
+                list_binary.append(bin_pix[::-1])
+            num += 1
+        for step in range(0, 80, 4):
+            str_uniq = ''.join(list_binary[step:step + 4])
+            list_done.append(str_uniq)
+        return list_done
+
+    @staticmethod
+    def split_into_pairs(step: int, hex_pair: list) -> (list, list):
+        down_list = []
+        up_list = []
+        count = 1
+        for part in hex_pair[step:step + 160]:
+            if count % 2 == 0:
+                down_list.append(part)
+            else:
+                up_list.append(part)
+            count += 1
+        return up_list, down_list
+
     def create_rgb_binary(self, response_item: int) -> (list, list, list):
         list_pair_hex = self.split_every_second_elements(response_item=response_item)
 
-        def split_into_pairs(step: int) -> (list, list):
-            down_list = []
-            up_list = []
-            count = 1
-            for part in list_pair_hex[step:step + 160]:
-                if count % 2 == 0:
-                    down_list.append(part)
-                else:
-                    up_list.append(part)
-                count += 1
-            return up_list, down_list
+        r_up, r_down = self.split_into_pairs(step=0, hex_pair=list_pair_hex)
+        g_up, g_down = self.split_into_pairs(step=160, hex_pair=list_pair_hex)
+        b_up, b_down = self.split_into_pairs(step=320, hex_pair=list_pair_hex)
 
-        def create_binary(list_hex: list, position: str) -> list:
-            list_binary = []
-            list_done = []
-            num = 0
-            for pix in list_hex:
-                bin_pix = self.binary_conversion(pix)
-                if position == 'up':
-                    list_binary.append(bin_pix)
-                if position == 'down':
-                    list_binary.append(bin_pix[::-1])
-                num += 1
-            for step in range(0, 80, 4):
-                str_uniq = ''.join(list_binary[step:step + 4])
-                list_done.append(str_uniq)
-            return list_done
-
-        r_up, r_down = split_into_pairs(step=0)
-        g_up, g_down = split_into_pairs(step=160)
-        b_up, b_down = split_into_pairs(step=320)
-
-        r_bin = create_binary(list_hex=r_up, position='up') + create_binary(list_hex=r_down, position='down')
-        g_bin = create_binary(list_hex=g_up, position='up') + create_binary(list_hex=g_down, position='down')
-        b_bin = create_binary(list_hex=b_up, position='up') + create_binary(list_hex=b_down, position='down')
+        r_bin = self.create_binary(list_hex=r_up, position='up') + self.create_binary(list_hex=r_down, position='down')
+        g_bin = self.create_binary(list_hex=g_up, position='up') + self.create_binary(list_hex=g_down, position='down')
+        b_bin = self.create_binary(list_hex=b_up, position='up') + self.create_binary(list_hex=b_down, position='down')
         return r_bin, g_bin, b_bin
 
     @staticmethod
@@ -153,23 +154,22 @@ class CabinetMonitor:
             list_red = self.sort_every_fifth_element(color_list=red)
             list_green = self.sort_every_fifth_element(color_list=green)
             list_blue = self.sort_every_fifth_element(color_list=blue)
+
             list_fixed_point = [1, 'r', 6, 'r', 11, 'r', 16, 'r', 21, 'r']
-            for cabinet in self.dict_cabinets:
-                if cabinet == self.number_cabinet:
-                    color_num = 0
-                    for module in self.dict_cabinets[cabinet]:
-                        if 'col' in module:
-                            continue
-                        if 'percent' in module:
-                            continue
-                        else:
-                            if list_fixed_point[num_response] <= int(module) <= list_fixed_point[num_response] + 4:
-                                self.dict_cabinets[cabinet][module]['red'] = list_red[color_num]
-                                self.dict_cabinets[cabinet][module]['green'] = list_green[color_num]
-                                self.dict_cabinets[cabinet][module]['blue'] = list_blue[color_num]
-                                color_num += 1
-                                if color_num == 5:
-                                    break
+
+            cabinet_contents = self.dict_cabinets[self.number_cabinet]
+            cont = ('col', 'percent')
+            color_num = 0
+            for module in cabinet_contents:
+                if module not in cont:
+                    if list_fixed_point[num_response] <= int(module) <= list_fixed_point[num_response] + 4:
+                        self.dict_cabinets[self.number_cabinet][module]['red'] = list_red[color_num]
+                        self.dict_cabinets[self.number_cabinet][module]['green'] = list_green[color_num]
+                        self.dict_cabinets[self.number_cabinet][module]['blue'] = list_blue[color_num]
+                        color_num += 1
+                        if color_num == 5:
+                            break
+
         self.calculate_broke_pixel()
         self.send_data_pixel_json()
 
@@ -182,6 +182,7 @@ def start_monitoring(self, duration):
         list_command_cabinet.append(a)
 
     def request_calculation(first_request: hex) -> list:
+        """Calculation of 25 requests for 1 cabinet"""
         request_for_one_cabinet_25 = [first_request]
         for _ in range(24):
             byte_request = bytearray.fromhex(first_request)
@@ -201,6 +202,7 @@ def start_monitoring(self, duration):
         return request_for_one_cabinet_25
 
     def create_list_response(list_query: list) -> list:
+        """25 responses for 1 cabinet"""
         list_request = []
         for command in list_query:
             resp = toi_connect.send_board_mon(command, sock, buffer=92406)
@@ -210,6 +212,7 @@ def start_monitoring(self, duration):
         return list_request
 
     def clean_10_response(list_response: list) -> list:
+        """Removing extra characters and we get 10 str"""
         result_list = []
         for i in range(25):
             if i in (0, 5, 10, 15, 20):
@@ -218,7 +221,6 @@ def start_monitoring(self, duration):
             if i in (2, 6, 12, 17, 22):
                 result_three = list_response[i][292:-4] + list_response[i + 1][36:-4] + list_response[i + 2][36:-324]
                 result_list.append(result_three)
-        print(result_list)
         return result_list
 
     data = create_dict_for_json(list_cab=duration)
