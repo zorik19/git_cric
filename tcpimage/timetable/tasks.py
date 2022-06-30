@@ -109,56 +109,44 @@ class CabinetMonitor:
                 break
         return result_color_list
 
-    def calculate_broke_pixel_and_sen_json(self) -> None:
-        for cabinet in self.dict_cabinets:
-            if cabinet == self.number_cabinet:
-                list_broke_pixels = []
-                for compound_cabinet in self.dict_cabinets[cabinet]:
-                    if 'col' in compound_cabinet:
-                        continue
-                    if 'percent' in compound_cabinet:
-                        continue
-                    else:
-                        broke_pixel = 0
-                        for module in self.dict_cabinets[cabinet][compound_cabinet]:
-                            broke_red = 0
-                            broke_green = 0
-                            broke_blue = 0
-                            if 'mod_col' in module:
-                                continue
-                            if 'r_col' in module:
-                                continue
-                            if 'g_col' in module:
-                                continue
-                            if 'b_col' in module:
-                                continue
-                            for broke_pix in self.dict_cabinets[cabinet][compound_cabinet][module]:
-                                broke_pixel += Counter(broke_pix)['0']
-                            for rr in self.dict_cabinets[cabinet][compound_cabinet]['red']:
-                                broke_red += Counter(rr)['0']
-                            for gg in self.dict_cabinets[cabinet][compound_cabinet]['green']:
-                                broke_green += Counter(gg)['0']
-                            for bb in self.dict_cabinets[cabinet][compound_cabinet]['blue']:
-                                broke_blue += Counter(bb)['0']
-                            self.dict_cabinets[cabinet][compound_cabinet]['r_col'] = broke_red
-                            self.dict_cabinets[cabinet][compound_cabinet]['g_col'] = broke_green
-                            self.dict_cabinets[cabinet][compound_cabinet]['b_col'] = broke_blue
-                        list_broke_pixels.append(broke_pixel)
-                        self.dict_cabinets[cabinet][compound_cabinet]['mod_col'] = broke_pixel
-                cabinet_count = sum(list_broke_pixels)
-                percent_broken_pixel = cabinet_count * 100 / 38400
-                if percent_broken_pixel > 1:
-                    percent_broken_pixel = round(percent_broken_pixel, 1)
-                percent_broken_pixel = round(percent_broken_pixel, 3)
-                self.dict_cabinets[cabinet]['col'] = cabinet_count
-                self.dict_cabinets[cabinet]['percent'] = percent_broken_pixel
+    def counter_broke_0(self, pix_color: str, module_item: str) -> int:
+        broke_count = 0
+        for pix_in_module in self.dict_cabinets[self.number_cabinet][module_item][pix_color]:
+            broke_count += Counter(pix_in_module)['0']
+        return broke_count
+
+    def calculate_broke_pixel(self) -> None:
+        cabinet_contents = self.dict_cabinets[self.number_cabinet]
+        list_broke_pixels = []
+        cont = ('col', 'percent')
+        for module in cabinet_contents:
+            if module not in cont:
+                broke_red = self.counter_broke_0(pix_color='red', module_item=module)
+                broke_green = self.counter_broke_0(pix_color='green', module_item=module)
+                broke_blue = self.counter_broke_0(pix_color='blue', module_item=module)
+                self.dict_cabinets[self.number_cabinet][module]['r_col'] = broke_red
+                self.dict_cabinets[self.number_cabinet][module]['g_col'] = broke_green
+                self.dict_cabinets[self.number_cabinet][module]['b_col'] = broke_blue
+                sum_broke_pixel_model = broke_red + broke_green + broke_blue
+                self.dict_cabinets[self.number_cabinet][module]['mod_col'] = sum_broke_pixel_model
+                list_broke_pixels.append(sum_broke_pixel_model)
+
+        cabinet_count = sum(list_broke_pixels)
+        percent_broken_pixel = cabinet_count * 100 / 38400
+        if percent_broken_pixel > 1:
+            percent_broken_pixel = round(percent_broken_pixel, 1)
+        percent_broken_pixel = round(percent_broken_pixel, 3)
+        self.dict_cabinets[self.number_cabinet]['col'] = cabinet_count
+        self.dict_cabinets[self.number_cabinet]['percent'] = percent_broken_pixel
+
+    def send_data_pixel_json(self):
         with open(constant.path_monitor_json, "w") as write_file:
             json.dump(self.dict_cabinets, write_file, indent=4)
 
     def run(self) -> None:
         for num_response in range(0, 10, 2):
-            red_1, green_1, blue_1 = self.create_rgb_binary(num_response)
-            red_2, green_2, blue_2 = self.create_rgb_binary(num_response + 1)
+            red_1, green_1, blue_1 = self.create_rgb_binary(response_item=num_response)
+            red_2, green_2, blue_2 = self.create_rgb_binary(response_item=num_response + 1)
             red = red_1 + red_2
             green = green_1 + green_2
             blue = blue_1 + blue_2
@@ -182,7 +170,8 @@ class CabinetMonitor:
                                 color_num += 1
                                 if color_num == 5:
                                     break
-        self.calculate_broke_pixel_and_sen_json()
+        self.calculate_broke_pixel()
+        self.send_data_pixel_json()
 
 
 @shared_task(bind=True)
@@ -223,12 +212,13 @@ def start_monitoring(self, duration):
     def clean_10_response(list_response: list) -> list:
         result_list = []
         for i in range(25):
-            if i == 0 or i == 5 or i == 10 or i == 15 or i == 20:
+            if i in (0, 5, 10, 15, 20):
                 result_two = list_response[i][36:-4] + list_response[i + 1][36:-68]
                 result_list.append(result_two)
-            if i == 2 or i == 7 or i == 12 or i == 17 or i == 22:
+            if i in (2, 6, 12, 17, 22):
                 result_three = list_response[i][292:-4] + list_response[i + 1][36:-4] + list_response[i + 2][36:-324]
                 result_list.append(result_three)
+        print(result_list)
         return result_list
 
     data = create_dict_for_json(list_cab=duration)
