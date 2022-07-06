@@ -5,6 +5,8 @@
 В Python типы данных можно разделить на 2 группы: Изменяемые и не именяемые
 
 """
+from decimal import Decimal
+
 list1 = [1, 2, 3]
 list2 = [1, 2, 3, 3]
 
@@ -271,3 +273,36 @@ for k in list_:
         continue
     else:
         print(int(k))
+
+
+# abstract Fabric
+
+class Factory(object):
+
+    def build_sequence(self):
+        return []
+
+    def build_number(self, string):
+        return Decimal(string)
+
+class Loader(object):
+    def load(string, factory):
+        sequence = factory.build_sequence()
+        for substring in string.split(','):
+            item = factory.build_number(substring)
+            sequence.append(item)
+        return sequence
+
+f = Factory()
+
+
+
+
+
+
+
+
+
+
+
+

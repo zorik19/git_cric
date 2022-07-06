@@ -3,11 +3,11 @@ from celery_progress.backend import ProgressRecorder
 import json
 from collections import Counter
 from .python_modules import constant, toi_connect
+from typing import Tuple
 
 
 def create_dict_for_json(list_cab: list) -> dict:
     data_in = {}
-
     for cabinet in list_cab:
         cabinet = str(cabinet)
         data_in[cabinet] = {}
@@ -76,7 +76,7 @@ class CabinetMonitor:
         return list_done
 
     @staticmethod
-    def split_into_pairs(step: int, hex_pair: list) -> (list, list):
+    def split_into_pairs(step: int, hex_pair: list) -> Tuple[list, list]:
         down_list = []
         up_list = []
         count = 1
@@ -88,7 +88,7 @@ class CabinetMonitor:
             count += 1
         return up_list, down_list
 
-    def create_rgb_binary(self, response_item: int) -> (list, list, list):
+    def create_rgb_binary(self, response_item: int) -> Tuple[list, list, list]:
         list_pair_hex = self.split_every_second_elements(response_item=response_item)
 
         r_up, r_down = self.split_into_pairs(step=0, hex_pair=list_pair_hex)
@@ -98,6 +98,7 @@ class CabinetMonitor:
         r_bin = self.create_binary(list_hex=r_up, position='up') + self.create_binary(list_hex=r_down, position='down')
         g_bin = self.create_binary(list_hex=g_up, position='up') + self.create_binary(list_hex=g_down, position='down')
         b_bin = self.create_binary(list_hex=b_up, position='up') + self.create_binary(list_hex=b_down, position='down')
+
         return r_bin, g_bin, b_bin
 
     @staticmethod
@@ -140,14 +141,16 @@ class CabinetMonitor:
         self.dict_cabinets[self.number_cabinet]['col'] = cabinet_count
         self.dict_cabinets[self.number_cabinet]['percent'] = percent_broken_pixel
 
-    def send_data_pixel_json(self):
+    def send_data_pixel_json(self) -> None:
         with open(constant.path_monitor_json, "w") as write_file:
             json.dump(self.dict_cabinets, write_file, indent=4)
 
     def run(self) -> None:
         for num_response in range(0, 10, 2):
+
             red_1, green_1, blue_1 = self.create_rgb_binary(response_item=num_response)
             red_2, green_2, blue_2 = self.create_rgb_binary(response_item=num_response + 1)
+
             red = red_1 + red_2
             green = green_1 + green_2
             blue = blue_1 + blue_2

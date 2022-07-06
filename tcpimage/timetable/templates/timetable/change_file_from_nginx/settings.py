@@ -25,7 +25,7 @@ SECRET_KEY = 'on-gaju470gh9z5bgw=_nl(dv4k-z-e#ah5o_0$1v*gg+g-*xo'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['111.111.111.111']
+ALLOWED_HOSTS = ['192.168.11.152']
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
 # Application definition
