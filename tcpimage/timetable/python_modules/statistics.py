@@ -29,8 +29,12 @@ def main():
     command_1 = '41564f4e0a00000051522100050400000000000000000b02'
     command_2 = '41564f4e0c00000051522100050100000000000000000a0241564f4e0d00000051521a000500000000000000000003' \
                 '0241564f4e0b00000051522100050300000000000000000b02'
-    final = statistic(command_1, command_2)
-    return final
+
+    try:
+        final = statistic(command_1, command_2)
+        return final
+    except:
+        return '30'
 
 
 if __name__ == "__main__":

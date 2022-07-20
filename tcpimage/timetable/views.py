@@ -1,28 +1,36 @@
 from django.shortcuts import render
 from . import services
 from . models import ScheduleBright, CabinetCount, ButtonMonitoring, CurrentImageInTOI, Images, AutoBright, IpConfig, \
-    IpConfigLAN
+    IpConfigLAN, ManualBright, ModeBright
 from .python_modules import statistics
 
 
+# Images.objects.filter(image_name = '1.png') Возьмет одно значение
+# Images.objects.filter(image_name = '1.png').only("title", "poster") Возьмет одно значение
 def brightness_control(request):
     """Change bright mode and set bright to TOI"""
-
+    _mode = ModeBright()
     if 'schedule_mode' in request.POST:
         services.apply_schedule_mode()
+        _mode.mode = 'Расписание'
+        _mode.save()
 
     if 'auto_mode' in request.POST:
         services.apply_auto_mode(request=request)
+        _mode.mode = 'Авто'
+        _mode.save()
 
     if 'manual' in request.POST:
         services.apply_manual_mode(request=request)
+        _mode.mode = 'Ручной'
+        _mode.save()
 
     context = {
         'schedule': AutoBright.objects.all(),
-        'current_manual_count': services.get_current_manual_count(),
+        'current_manual_count': ManualBright.objects.last().manual_count,
         'auto_current': services.calculate_current_bright_in_auto_mode(),
-        'mode': services.current_mode(),
         'shc_mode': ScheduleBright.objects.all(),
+        'mode_br': ModeBright.objects.last()
     }
     return render(request, 'timetable/brightness.html', context)
 
@@ -90,6 +98,7 @@ def ipconfig(request):
             if 'lan' in request.POST.get('exampleRadios'):
                 services.save_new_ip(request=request, models=IpConfigLAN())
                 services.change_wan_and_lan_setting(models=IpConfigLAN, mode='lan')
+
     models = [IpConfig, IpConfigLAN]
     return render(request, 'timetable/ipconfig.html', context=services.context_for_network(models=models))
 

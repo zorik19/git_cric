@@ -109,10 +109,11 @@
 
 <body>
   <br>
-  <br>
+
 
   <div>
-    <h4>Последний выставленный режим яркости: {{mode}}</h4>
+    <h4>Последний выставленный режим яркости: {{ mode_br.mode }}</h4>
+      <h5>Изменён: {{ mode_br.date }}</h5>
     <br>
   </div>
   <div class="tabs">
@@ -291,7 +292,7 @@
     </div>
   </div>
 <div id="mode" style="font-size: 0">
-  {{mode}}
+  {{mode_br.mode}}
 </div>
 </body>
 
@@ -315,16 +316,13 @@
       let modeText = idMode.textContent
       console.log(modeText, 'modeText')
       function check() {
-         if (modeText.indexOf('auto') !== -1) {
-           console.log('in auto')
+         if (modeText.indexOf('Авто') !== -1) {
             document.getElementById("tab-btn-1").checked = true;
          }
-         else if (modeText.indexOf('manual') !== -1) {
-           console.log('in manual')
+         else if (modeText.indexOf('Ручной') !== -1) {
             document.getElementById("tab-btn-2").checked = true;
          }
-         else if (modeText.indexOf('schedule') !== -1) {
-           console.log('in schedule')
+         else if (modeText.indexOf('Расписание') !== -1) {
             document.getElementById("tab-btn-3").checked = true;
          }
       }

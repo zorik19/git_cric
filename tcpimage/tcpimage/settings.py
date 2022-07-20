@@ -46,9 +46,13 @@ INSTALLED_APPS = [
     'django_htmx',
     'channels',
     'users',
+    'silk',
+    'django_celery_beat'
 ]
 
 MIDDLEWARE = [
+    'silk.middleware.SilkyMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -58,6 +62,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
+
 ]
 
 ROOT_URLCONF = 'tcpimage.urls'
@@ -149,6 +154,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Moscow'
 CELERY_RESULT_BACKEND = 'django-db'
 
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 MEDIA_URL = '/media/myimage/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Images, CabinetCount, AutoBright, CurrentImageInTOI, ManualBright, IpConfig, ScheduleBright, IpConfigLAN
+from .models import Images, CabinetCount, AutoBright, CurrentImageInTOI, ManualBright, IpConfig, ScheduleBright, \
+    IpConfigLAN, ModeBright
 
 
 class BrightTableAdmin(admin.ModelAdmin):
@@ -21,5 +22,6 @@ admin.site.register(ManualBright)
 admin.site.register(IpConfig)
 admin.site.register(ScheduleBright)
 admin.site.register(IpConfigLAN)
+admin.site.register(ModeBright)
 
 

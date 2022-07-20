@@ -5,6 +5,28 @@ from collections import Counter
 from .python_modules import constant, toi_connect
 from typing import Tuple
 
+from django_celery_beat.models import PeriodicTask
+from .models import ModeBright
+
+
+@shared_task(name="repeat_order_make")
+def repeat_order_make(order_id):
+    order = ModeBright.objects.get(pk=order_id)
+    if order.status != '0':
+        print('Статус получен!')
+        task = PeriodicTask.objects.get(name='Repeat order {}'.format(order_id))
+        task.enabled = False
+        task.save()
+    else:
+        # Необходимая логика при повторной отправке заказа
+        _mode = ModeBright.objects.all()
+        for _ in _mode.mode:
+            print(_, 'for new mode in TOI')
+            a = _mode[1:6]
+            print(a, '--__')
+            print('TOI connector for base')
+        print('Я должна повторно оформлять заказ каждые 10 секунд')
+
 
 def create_dict_for_json(list_cab: list) -> dict:
     data_in = {}

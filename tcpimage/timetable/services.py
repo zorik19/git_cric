@@ -20,23 +20,15 @@ def current_mode():
 
 
 def apply_auto_mode(request) -> None:
-    time_field_name = 'time_bright'
-    bright_field_name = 'bright_count'
     obj_timetable = AutoBright.objects.all()
     timetable_list = []
     for item in obj_timetable:
-        time_field_object = AutoBright._meta.get_field(time_field_name)
-        time_field_value = time_field_object.value_from_object(item)
-        time_field_value = str(time_field_value)
-        hours = int(time_field_value[:2])
-        minute = int(time_field_value[3:5])
-        bright_field_object = AutoBright._meta.get_field(bright_field_name)
-        bright_field_value = bright_field_object.value_from_object(item)
-        list_item = ['true', '0 ' + str(minute) + ' ' + str(hours), str(bright_field_value)]
-        timetable_list.append(list_item)
+        hours_minute = str(item.time_bright).split(':')
+        bright_value = str(item.bright_count)
+        _list_item = ['true', '0 ' + str(int(hours_minute[1])) + ' ' + str(int(hours_minute[0])), bright_value]
+        timetable_list.append(_list_item)
     if auto_bright.main(timetable_list) == 'done':
         messages.add_message(request, messages.INFO, "Выставлена авто-яркость")
-        change_mode_brightness(name='auto')
     else:
         messages.add_message(request, messages.INFO, "Сервер не доступен!")
 
@@ -58,16 +50,8 @@ def apply_manual_mode(request) -> None:
     manual_db.save()
     if manual_bright.main(str(manual_db.manual_count)) == 'done':
         messages.add_message(request, messages.INFO, "Яркость изменена. Значение: " + str(manual_db.manual_count))
-        change_mode_brightness(name='manual')
     else:
         messages.add_message(request, messages.INFO, "Сервер не доступен!")
-
-
-def get_current_manual_count():
-    obj = ManualBright.objects.last()
-    field_object = ManualBright._meta.get_field('manual_count')
-    field_value = field_object.value_from_object(obj)
-    return field_value
 
 
 def calculate_current_bright_in_auto_mode() -> int:
@@ -174,7 +158,7 @@ def run_calculate_monitoring_with_celery():
         cab_field_value = cab_field_object.value_from_object(item)
         cab_list.append(cab_field_value)
     task = start_monitoring.delay(cab_list)
-    pod_cab = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+    pod_cab = [i for i in range(1, 26)]
 
     context = {
         'task_id': task.task_id,
@@ -234,6 +218,7 @@ def save_new_ip(request, models):
 
 def change_wan_and_lan_setting(models, mode: str):
     ip_base = models._meta.get_field('ip')
+
     ip_value = ip_base.value_from_object(models.objects.last())
 
     mask_base = models._meta.get_field('mask')
@@ -402,7 +387,7 @@ def apply_schedule_mode():
     list1 = create_auto_bright_array()
     x = threading.Thread(target=auto_bright.main, args=(list1,))
     x.start()
-    change_mode_brightness(name='schedule')
-    # hh
+
+
 
 

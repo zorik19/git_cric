@@ -1,5 +1,13 @@
+import os
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "timetable.settings")
+django.setup()
+
 import time
 from tcpimage.timetable.python_modules import constant, toi_connect, auto_bright
+from tcpimage.timetable.models import *
+from django.db.models import Max
 import os
 from openpyxl import load_workbook
 from datetime import datetime
@@ -37,8 +45,7 @@ def create_schedule_from_xlsx(list_bright_const: list) -> tuple:
                 minutes = str(int(dat[3:5]))
                 list_result.append(['true', '0 ' + minutes + ' ' + hours, str(list_bright_const[num - 1])])
                 if int(now_time_sep[0]) >= int(hours):
-                    # int(now_time_sep[1]) > int(minutes):
-
+                    # int(now_time_sep[1]) > int(minutes)
                     x = num
 
     print(list_result, 'result')
@@ -72,6 +79,9 @@ if __name__ == "__main__":
     a, b = create_schedule_from_xlsx(calculate_bright_list(delta=0, num_str=0))
     result_list = a
 
+    _mode = ModeBright.objects.last()
+    print(_mode.mode)
+
     with open(os.path.join(constant.path_mode, 'mode_bright.txt'), 'r') as mode:
         for line in mode:
             if line == 'schedule':
@@ -90,5 +100,3 @@ if __name__ == "__main__":
             else:
                 print('Другой режим')
                 break
-
-

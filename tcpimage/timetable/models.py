@@ -17,6 +17,12 @@ class AutoBright(models.Model):
     bright_count = models.IntegerField(blank=True)
 
 
+class ModeBright(models.Model):
+    id = models.AutoField(primary_key=True)
+    mode = models.CharField(max_length=10)
+    date = models.DateTimeField(auto_now_add=True)
+
+
 class ScheduleBright(models.Model):
     id = models.AutoField(primary_key=True)
     time_bright = models.CharField(max_length=30, blank=True)
